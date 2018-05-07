@@ -1,8 +1,14 @@
 package javafxapplication1;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -28,7 +34,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
-import javafx.scene.media.AudioClip;
 
 /**
  *
@@ -165,7 +170,7 @@ public class JavaFXApplication1 extends Application implements EventHandler<KeyE
                 System.out.println("Runned");
             }
         };
-        timer.schedule(timerTask, 2000);
+        timer.schedule(timerTask, 1000);
 
     }
 
@@ -507,7 +512,7 @@ public class JavaFXApplication1 extends Application implements EventHandler<KeyE
         Button saveButton = new Button("Save All Change");
         manageUserPane.getChildren().add(saveButton);
         saveButton.setStyle("-fx-background-color: #34495e;");
-        saveButton.setLayoutX(450);
+        saveButton.setLayoutX(455);
         saveButton.setLayoutY(550);
 
         Button backButton = new Button("Return");
@@ -515,6 +520,12 @@ public class JavaFXApplication1 extends Application implements EventHandler<KeyE
         backButton.setStyle("-fx-background-color: #34495e;");
         backButton.setLayoutX(400);
         backButton.setLayoutY(550);
+        
+        Button exportButton = new Button("Export");
+         manageUserPane.getChildren().add(exportButton);
+        exportButton.setStyle("-fx-background-color: #34495e;");
+        exportButton.setLayoutX(565);
+        exportButton.setLayoutY(550);
 
         saveButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -550,10 +561,44 @@ public class JavaFXApplication1 extends Application implements EventHandler<KeyE
             @Override
             public void handle(ActionEvent event) {
                 selection.setVisible(true);
-                manageUserPane.getChildren().removeAll(saveButton, backButton, scrollPane);
+                manageUserPane.getChildren().removeAll(saveButton, backButton, scrollPane,exportButton);
 
             }
         });
+        
+        exportButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                     PrintWriter pw = null;
+                try {
+                  
+                    pw = new PrintWriter(new File("Account-Export"+".csv"));
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(JavaFXApplication1.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                         UserList userListMaster = new UserList();
+                         userListMaster.userList = new ArrayList<User>();
+                         userListMaster = Main.readUserDataFile(userListMaster);
+                         
+                          StringBuilder sb = new StringBuilder();
+                         
+                         for (int i = 0; i <userListMaster.userList.size() ; i++) {
+                             sb.append(userListMaster.userList.get(i).getUsername());
+                             sb.append(',');
+                             sb.append(userListMaster.userList.get(i).getBalance());
+                             sb.append('\n');
+                                 }
+                         sb.append('\n');
+                         sb.append('\n');
+                         sb.append(LocalDateTime.now());
+
+                        pw.write(sb.toString());
+                        pw.close();
+                        System.out.println("Data Exported!");
+
+            }
+        });
+        
         for (int i = 0; i < userListMaster.userList.size(); i++) {
             System.out.println("Size: " + userListMaster.userList.size());
             System.out.println(i);
@@ -776,6 +821,8 @@ public class JavaFXApplication1 extends Application implements EventHandler<KeyE
         paneOperation.getChildren().add(stackH2);
         vboxLabelUser.setLayoutX(250);
         vboxLabelUser.setLayoutY(150);
+        
+       // stackH2.setStyle("-fx-background-radius: 1");
 
         ///Operation: Instruction
         StackPane stackIns = new StackPane();
